@@ -1,10 +1,13 @@
 #include "npapi-file-io.h"
 #include "stubs.h"
 #include "file-io.h"
+#include <sstream>
 
 NPPluginFuncs *pluginFuncs = NULL;
 NPNetscapeFuncs *browserFuncs = NULL;
 NPObject *javascriptListener = NULL;
+
+NPP globalInstance = NULL;
 
 static NPClass JavascriptListener_NPClass = {
   NP_CLASS_STRUCT_VERSION_CTOR,
@@ -79,6 +82,8 @@ NPError GetValue(NPP instance, NPPVariable variable, void *value) {
     case NPPVpluginScriptableNPObject: {
       javascriptListener = (NPObject *)browserFuncs->createobject(instance, (NPClass *)&JavascriptListener_NPClass);
       *((NPObject **)value) = javascriptListener;
+      //TODO: Per-instance
+      globalInstance = instance;
       break;
     }
     default: {
@@ -113,14 +118,34 @@ bool InvokeJavascript(NPObject *npobj,
     //getTextFile(filename : string) : string
     char *value = NULL;
     size_t len;
-    if (getText(args[0].value.stringValue.UTF8Characters, value, len)) {
+    if (getFile(args[0].value.stringValue.UTF8Characters, value, len, false)) {
       SetReturnValue(value, len, *result);
       delete[] value;
       return true;
     }
     delete[] value;
+  } else if (!strcmp(methodName, "getBinaryFile")) {
+    char *value = NULL;
+    size_t len;
+    if (getFile(args[0].value.stringValue.UTF8Characters, value, len, true)) {
+      SetArrayReturnValue(value, len, result);
+    }
+    return true;
   }
   return false;
+}
+
+NPVariant *eval(NPP instance, const char *scriptString) {
+  NPString script;
+  script.UTF8Characters = scriptString;
+  script.UTF8Length = strlen(script.UTF8Characters);
+  
+  NPObject *window = NULL;
+  browserFuncs->getvalue(instance, NPNVWindowNPObject, &window);
+  NPVariant *result = new NPVariant();
+  browserFuncs->evaluate(instance, window, &script, result);
+  browserFuncs->releaseobject(window);
+  return result;
 }
 
 bool SetReturnValue(const bool value, NPVariant &result) {
@@ -137,5 +162,19 @@ bool SetReturnValue(const char *value, const size_t len, NPVariant &result) {
   memcpy(resultString, value, len);
   resultString[dstLen - 1] = 0;
   STRINGN_TO_NPVARIANT(resultString, len, result);
+  return true;
+}
+
+bool SetArrayReturnValue(const char *value, const size_t len, NPVariant *result) {
+  std::ostringstream str;
+  str << "(function() { return [";
+  if (len > 0) {
+    str << (int)value[0];
+  }
+  for (size_t i = 1; i < len; ++i) {
+    str << "," << (int)value[i];
+  }
+  str << "]; })()";
+  *result = *eval(globalInstance, str.str().c_str());
   return true;
 }

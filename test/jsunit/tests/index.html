@@ -46,17 +46,22 @@
   
   function testGetBinaryFileForTextFileReturnsFileContents() {
     var a = getPath("a.txt");
-    assertEquals([97], plugin.getBinaryFile(a));
+    assertArrayEquals([97], plugin.getBinaryFile(a));
+  }
+  
+  function testGetBinaryFileForTextFileReturnsNewLinesWithoutCarriageReturns() {
+    var exists = getPath("exists.txt");
+    assertArrayEquals([73, 32, 99, 111, 110, 116, 97, 105, 110, 13, 10, 115, 111, 109, 101, 32, 116, 101, 120, 116, 13, 10, 32, 32, 111, 110, 32, 109, 117, 108, 116, 105, 112, 108, 101, 32, 108, 105, 110, 101, 115], plugin.getBinaryFile(exists));
   }
   
   function testGetBinaryFileForBinaryFileContainingNullReturnsFileContents() {
     var a = getPath("containsnull.txt");
-    assertEquals([97, 0, 99], plugin.getBinaryFile(a));
+    assertArrayEquals([97, 0, 99], plugin.getBinaryFile(a));
   }
   
-  function testGetTextFileForBinaryFileContainingNullReturnsUndefined() {
+  function testGetTextFileForBinaryFileContainingNullThrows() {
     var a = getPath("containsnull.txt");
-    assertUndefined(plugin.getTextFile(a));
+    assertThrows(function() { plugin.getTextFile(a) });
   }
   
   function testUnsupportedFunctionThrows() {
@@ -127,6 +132,9 @@
   
   //TODO: ls
   //TODO: getTmpPath
+  //TODO: mkdir
+  //TODO: createText
+  //TODO: createBinary
   </script>
 </head>
 <body>

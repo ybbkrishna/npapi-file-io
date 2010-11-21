@@ -23,9 +23,9 @@ bool fileExists(const char *filename, bool &exists) {
   return false;
 }
 
-bool getText(const char *filename, char *&value, size_t &len) {
+bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {
   FILE *file;
-  fopen_s(&file, filename, "r");
+  fopen_s(&file, filename, (isBinary ? "rb" : "r"));
   if (!file) {
     return false;
   }
@@ -42,5 +42,13 @@ bool getText(const char *filename, char *&value, size_t &len) {
 
   len = fread(value, 1, fileLength, file);
   fclose(file);
+
+  if (!isBinary) {
+    for (size_t i = 0; i < len; ++i) {
+      if (value[i] == 0) {
+        return false;
+      }
+    }
+  }
   return true;
 }
