@@ -1,6 +1,7 @@
 #include "npapi-file-io.h"
 #include "stubs.h"
 #include "file-io.h"
+#include <direct.h>
 #include <sstream>
 
 NPPluginFuncs *pluginFuncs = NULL;
@@ -149,7 +150,9 @@ bool InvokeJavascript(NPObject *npobj,
       SetArrayReturnValue(value, len, GetInstance(npobj), result);
     }
     return true;
-  }
+  } else if (!strcmp(methodName, "mkdir")) {
+    return _mkdir(args[0].value.stringValue.UTF8Characters) == 0;
+  }   
   return false;
 }
 

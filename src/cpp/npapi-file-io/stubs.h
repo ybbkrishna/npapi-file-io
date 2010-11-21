@@ -71,15 +71,6 @@ static NPError StubSetValue(NPP instance, NPNVariable variable,
 }
 
 //For Javascript listener
-static NPObject *StubAllocate(NPP npp, NPClass *clazz) {
-  NPObject *obj = new NPObject();
-  obj->_class = clazz;
-  obj->referenceCount = 0;
-  return obj;
-}
-
-static void StubDeallocate(NPObject *npobj) {}
-
 static void StubInvalidate(NPObject *npobj) {}
 
 static bool StubInvokeDefault(NPObject *npobj,

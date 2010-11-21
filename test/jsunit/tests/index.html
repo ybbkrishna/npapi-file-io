@@ -110,12 +110,26 @@
     callWithTwoArgumentsThrows(plugin.getBinaryFile);
   }
   
+  function testCanMkdir() {
+    var subdir = "subdir\\";
+    plugin.mkdir(getPath(subdir));
+    assertThrows(function() { plugin.mkdir(getPath(subdir)); });
+    //TODO: Make new file and assert on its contents
+    //TODO: rm dir
+  }
+  
+  function testMkdirThrowsForExistingDirectory() {
+    assertThrows(function() { plugin.mkdir(getPath("")); });
+  }
+  
   function assertThrows(fun) {
     try {
       fun();
       fail("Expected exception");
     } catch (e) {
-      //Expected
+      if (e.isJsUnitFailure !== undefined) {
+        throw e;
+      }
     }
   }
   
@@ -132,9 +146,10 @@
   
   //TODO: ls
   //TODO: getTmpPath
-  //TODO: mkdir
   //TODO: createText
   //TODO: createBinary
+  //TODO: isDirectory
+  //TODO: rm
   </script>
 </head>
 <body>
