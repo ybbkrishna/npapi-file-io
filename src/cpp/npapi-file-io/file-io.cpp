@@ -9,18 +9,14 @@
 #endif
 #include <sys/stat.h>
 
+#include <direct.h>
+
 //Returns true if successful, false otherwise
 //Sets exists to true if fileExists, false otherwise
 bool fileExists(const char *filename, bool &exists) {
-#if defined(OS_WIN)
-  exists = _access(filename, 0) != -1;
-  return true;
-#elif defined(OS_LINUX) || defined(OS_MAC)
   struct stat s;
-  *exists = stat(path, &s) == 0;
+  exists = stat(filename, &s) == 0;
   return true;
-#endif
-  return false;
 }
 
 bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {
@@ -51,4 +47,8 @@ bool getFile(const char *filename, char *&value, size_t &len, const bool isBinar
     }
   }
   return true;
+}
+
+bool myMkdir(const char *filename) {
+  return _mkdir(filename) == 0;
 }
