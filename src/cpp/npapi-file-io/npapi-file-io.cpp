@@ -7,12 +7,10 @@ NPPluginFuncs *pluginFuncs = NULL;
 NPNetscapeFuncs *browserFuncs = NULL;
 NPObject *javascriptListener = NULL;
 
-NPP globalInstance = NULL;
-
 static NPClass JavascriptListener_NPClass = {
   NP_CLASS_STRUCT_VERSION_CTOR,
-  StubAllocate,
-  StubDeallocate,
+  Allocate,
+  Deallocate,
   StubInvalidate,
   HasJavascriptMethod,
   InvokeJavascript,
@@ -77,13 +75,33 @@ NPError SetBrowserFuncs(NPNetscapeFuncs *browser_funcs) {
   return NPERR_NO_ERROR;
 }
 
+NPObject *Allocate(NPP instance, NPClass *clazz) {
+  NPObject *obj = (NPObject *)new NPClassWithNPP;
+  obj->_class = clazz;
+  obj->referenceCount = 0;
+  return obj;
+}
+
+void Deallocate(NPObject *obj) {
+  delete (NPClassWithNPP *)obj;
+}
+
+void SetInstance(NPP instance, NPObject *passedObj) {
+  NPClassWithNPP *obj = (NPClassWithNPP *)passedObj;
+  obj->npp = instance;
+}
+
+NPP GetInstance(NPObject *passedObj) {
+  NPClassWithNPP *obj = (NPClassWithNPP *)passedObj;
+  return obj->npp;
+}
+
 NPError GetValue(NPP instance, NPPVariable variable, void *value) {
   switch (variable) {
     case NPPVpluginScriptableNPObject: {
       javascriptListener = (NPObject *)browserFuncs->createobject(instance, (NPClass *)&JavascriptListener_NPClass);
       *((NPObject **)value) = javascriptListener;
-      //TODO: Per-instance
-      globalInstance = instance;
+      SetInstance(instance, javascriptListener);
       break;
     }
     default: {
@@ -128,7 +146,7 @@ bool InvokeJavascript(NPObject *npobj,
     char *value = NULL;
     size_t len;
     if (getFile(args[0].value.stringValue.UTF8Characters, value, len, true)) {
-      SetArrayReturnValue(value, len, result);
+      SetArrayReturnValue(value, len, GetInstance(npobj), result);
     }
     return true;
   }
@@ -165,7 +183,7 @@ bool SetReturnValue(const char *value, const size_t len, NPVariant &result) {
   return true;
 }
 
-bool SetArrayReturnValue(const char *value, const size_t len, NPVariant *result) {
+bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVariant *result) {
   std::ostringstream str;
   str << "(function() { return [";
   if (len > 0) {
@@ -175,6 +193,6 @@ bool SetArrayReturnValue(const char *value, const size_t len, NPVariant *result)
     str << "," << (int)value[i];
   }
   str << "]; })()";
-  *result = *eval(globalInstance, str.str().c_str());
+  *result = *eval(instance, str.str().c_str());
   return true;
 }

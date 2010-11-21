@@ -15,12 +15,33 @@ NPError NP_Shutdown(void);
 
 NPError SetPluginFuncs(NPPluginFuncs *plugin_funcs);
 NPError SetBrowserFuncs(NPNetscapeFuncs *browser_funcs);
+NPObject *Allocate(NPP instance, NPClass *clazz);
+void Deallocate(NPObject *obj);
 NPError GetValue(NPP instance, NPPVariable variable, void *value);
 NPVariant *eval(NPP instance, const char *scriptString);
 bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name);
 bool InvokeJavascript(NPObject *npobj, NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
-bool SetArrayReturnValue(const char *value, const size_t len, NPVariant *result);
+bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVariant *result);
 bool SetReturnValue(const char *value, const size_t len, NPVariant &result);
 bool SetReturnValue(const bool value, NPVariant &result);
+void SetInstance(NPP instance, NPObject *passedObj);
+NPP GetInstance(NPObject *passedObj);
+
+struct NPClassWithNPP {
+  uint32_t structVersion;
+  NPAllocateFunctionPtr allocate;
+  NPDeallocateFunctionPtr deallocate;
+  NPInvalidateFunctionPtr invalidate;
+  NPHasMethodFunctionPtr hasMethod;
+  NPInvokeFunctionPtr invoke;
+  NPInvokeDefaultFunctionPtr invokeDefault;
+  NPHasPropertyFunctionPtr hasProperty;
+  NPGetPropertyFunctionPtr getProperty;
+  NPSetPropertyFunctionPtr setProperty;
+  NPRemovePropertyFunctionPtr removeProperty;
+  NPEnumerationFunctionPtr enumerate;
+  NPConstructFunctionPtr construct;
+  NPP npp;
+};
 
 #endif //NPAPI_FILE_IO_H_
