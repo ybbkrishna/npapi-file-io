@@ -91,6 +91,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="file-io.h" />
     <ClInclude Include="npapi-file-io.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stubs.h" />
@@ -108,6 +109,7 @@
     <None Include="npapi-file-io.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="file-io.cpp" />
     <ClCompile Include="npapi-file-io.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

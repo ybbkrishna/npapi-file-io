@@ -1,5 +1,6 @@
 #include "npapi-file-io.h"
 #include "stubs.h"
+#include "file-io.h"
 
 NPPluginFuncs *pluginFuncs = NULL;
 NPNetscapeFuncs *browserFuncs = NULL;
@@ -88,6 +89,7 @@ NPError GetValue(NPP instance, NPPVariable variable, void *value) {
 }
 
 bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name) {
+  //const char *method = browser_funcs_->utf8fromidentifier(name);
   return true;
 }
 
@@ -96,5 +98,41 @@ bool InvokeJavascript(NPObject *npobj,
                       const NPVariant *args,
                       uint32_t argCount,
                       NPVariant *result) {
+  const char *methodName = browserFuncs->utf8fromidentifier(name);
+  if (!strcmp(methodName, "fileExists")) {
+    //fileExists(filename : string) : bool
+    bool exists;
+    if (fileExists(args[0].value.stringValue.UTF8Characters, exists)) {
+      SetReturnValue(exists, *result);
+      return true;
+    }
+  } else if (!strcmp(methodName, "getTextFile")) {
+    //getTextFile(filename : string) : string
+    char *value = NULL;
+    size_t len;
+    if (getText(args[0].value.stringValue.UTF8Characters, value, len)) {
+      SetReturnValue(value, len, *result);
+      delete[] value;
+      return true;
+    }
+    delete[] value;
+  }
+  return false;
+}
+
+bool SetReturnValue(const bool value, NPVariant &result) {
+  BOOLEAN_TO_NPVARIANT(value, result);
+  return true;
+}
+
+bool SetReturnValue(const char *value, const size_t len, NPVariant &result) {
+  const size_t dstLen = len + 1;
+  char *resultString = (char *)browserFuncs->memalloc(dstLen);
+  if (!resultString) {
+    return false;
+  }
+  memcpy(resultString, value, len);
+  resultString[dstLen - 1] = 0;
+  STRINGN_TO_NPVARIANT(resultString, len, result);
   return true;
 }
