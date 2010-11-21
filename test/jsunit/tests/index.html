@@ -56,11 +56,77 @@
   
   function testGetTextFileForBinaryFileContainingNullReturnsUndefined() {
     var a = getPath("containsnull.txt");
-    assertEquals(undefined, plugin.getTextFile(a));
+    assertUndefined(plugin.getTextFile(a));
+  }
+  
+  function testUnsupportedFunctionThrows() {
+    try {
+      plugin.foo();
+      fail("Expected exception");
+    } catch (e) {
+      //Expected
+    }
+  }
+
+  
+  function testFileExistsWithNoArgumentsThrows() {
+    assertThrows(plugin.fileExists);
+  }
+  
+  function testFileExistsWithNonStringThrows() {
+    callWithNonStringThrows(plugin.fileExists);
+  }
+  
+  function testFileExistsWithTwoArgumentsThrows() {
+    callWithTwoArgumentsThrows(plugin.fileExists);
+  }
+  
+  function testFileExistsWithNoArgumentsThrows() {
+    assertThrows(plugin.getTextFile);
+  }
+  
+  function testFileExistsWithNonStringThrows() {
+    callWithNonStringThrows(plugin.getTextFile);
+  }
+  
+  function testFileExistsWithTwoArgumentsThrows() {
+    callWithTwoArgumentsThrows(plugin.getTextFile);
+  }
+  
+  function testFileExistsWithNoArgumentsThrows() {
+    assertThrows(plugin.getBinaryFile);
+  }
+  
+  function testFileExistsWithNonStringThrows() {
+    callWithNonStringThrows(plugin.getBinaryFile);
+  }
+  
+  function testFileExistsWithTwoArgumentsThrows() {
+    callWithTwoArgumentsThrows(plugin.getBinaryFile);
+  }
+  
+  function assertThrows(fun) {
+    try {
+      fun();
+      fail("Expected exception");
+    } catch (e) {
+      //Expected
+    }
+  }
+  
+  function callWithNonStringThrows(fun) {
+    assertThrows(function () { fun(1); });
+    assertThrows(function () { fun(true); });
+    assertThrows(function () { fun({}); });
+    assertThrows(function () { fun([]); });
+  }
+  
+  function callWithTwoArgumentsThrows(fun) {
+    assertThrows(function() { fun("foo", "bar"); });
   }
   
   //TODO: ls
-  //TODO: test invalid parameters
+  //TODO: getTmpPath
   </script>
 </head>
 <body>

@@ -98,6 +98,9 @@ bool InvokeJavascript(NPObject *npobj,
                       const NPVariant *args,
                       uint32_t argCount,
                       NPVariant *result) {
+  if (argCount != 1 || !NPVARIANT_IS_STRING(args[0])) {
+    return false;
+  }
   const char *methodName = browserFuncs->utf8fromidentifier(name);
   if (!strcmp(methodName, "fileExists")) {
     //fileExists(filename : string) : bool
