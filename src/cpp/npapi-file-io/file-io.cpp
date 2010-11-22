@@ -13,16 +13,14 @@
 
 //Returns true if successful, false otherwise
 //Sets exists to true if fileExists, false otherwise
-bool fileExists(const char *filename, bool &exists) {
+bool fileExists(const char *filename) {
   struct stat s;
-  exists = stat(filename, &s) == 0;
-  return true;
+  return stat(filename, &s) == 0;
 }
 
 bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {
   FILE *file;
-  fopen_s(&file, filename, (isBinary ? "rb" : "r"));
-  if (!file) {
+  if (fopen_s(&file, filename, (isBinary ? "rb" : "r")) || !file) {
     return false;
   }
 
@@ -46,6 +44,22 @@ bool getFile(const char *filename, char *&value, size_t &len, const bool isBinar
       }
     }
   }
+  return true;
+}
+
+bool saveText(const char *filename, const char *value, size_t len) {
+  if (fileExists(filename)) {
+    return false;
+  }
+  FILE *file;
+  if (fopen_s(&file, filename, "w") || !file) {
+    return false;
+  }
+  if (fputs(value, file) == EOF) {
+    fclose(file);
+    return false;
+  }
+  fclose(file);
   return true;
 }
 

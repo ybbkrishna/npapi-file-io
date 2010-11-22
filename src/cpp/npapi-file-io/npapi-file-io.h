@@ -21,6 +21,7 @@ NPError GetValue(NPP instance, NPPVariable variable, void *value);
 NPVariant *eval(NPP instance, const char *scriptString);
 bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name);
 bool InvokeJavascript(NPObject *npobj, NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
+bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVariant &arg, NPVariant *&result);
 bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVariant *result);
 bool SetReturnValue(const char *value, const size_t len, NPVariant &result);
 bool SetReturnValue(const bool value, NPVariant &result);

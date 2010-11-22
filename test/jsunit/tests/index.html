@@ -44,6 +44,12 @@
     assertEquals("I contain\nsome text\n  on multiple lines", plugin.getTextFile(exists));
   }
   
+  function testSaveTextSavesText() {
+    var toMake = getPath("exists-copy.txt");
+    plugin.saveText(toMake, "a");
+    assertEquals("a", plugin.getTextFile(toMake));
+  }
+  
   function testGetBinaryFileForTextFileReturnsFileContents() {
     var a = getPath("a.txt");
     assertArrayEquals([97], plugin.getBinaryFile(a));
@@ -52,6 +58,15 @@
   function testGetBinaryFileForTextFileReturnsNewLinesWithoutCarriageReturns() {
     var exists = getPath("exists.txt");
     assertArrayEquals([73, 32, 99, 111, 110, 116, 97, 105, 110, 13, 10, 115, 111, 109, 101, 32, 116, 101, 120, 116, 13, 10, 32, 32, 111, 110, 32, 109, 117, 108, 116, 105, 112, 108, 101, 32, 108, 105, 110, 101, 115], plugin.getBinaryFile(exists));
+  }
+  
+  function testSaveTextSavesNewLinesWithCarriageReturnsOnWindowsAndWithoutOnLinux() {
+    var toMake = getPath("new.txt");
+    plugin.saveText(toMake, "I contain\nsome text\n  on multiple lines")
+    var expected = (getPlatform() == "windows") ?
+      [73, 32, 99, 111, 110, 116, 97, 105, 110, 13, 10, 115, 111, 109, 101, 32, 116, 101, 120, 116, 13, 10, 32, 32, 111, 110, 32, 109, 117, 108, 116, 105, 112, 108, 101, 32, 108, 105, 110, 101, 115] : 
+      [73, 32, 99, 111, 110, 116, 97, 105, 110, 10, 115, 111, 109, 101, 32, 116, 101, 120, 116, 10, 32, 32, 111, 110, 32, 109, 117, 108, 116, 105, 112, 108, 101, 32, 108, 105, 110, 101, 115];
+    assertArrayEquals(expected, plugin.getBinaryFile(toMake));
   }
   
   function testGetBinaryFileForBinaryFileContainingNullReturnsFileContents() {
@@ -146,10 +161,9 @@
   
   //TODO: ls
   //TODO: getTmpPath
-  //TODO: createText
-  //TODO: createBinary
+  //TODO: saveBinary
   //TODO: isDirectory
-  //TODO: rm
+  //TODO: rm (= rm -rf)
   </script>
 </head>
 <body>
