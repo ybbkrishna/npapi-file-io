@@ -1,0 +1,68 @@
+<!DOCTYPE XHTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>NPAPI File IO test</title>
+  <script type="text/javascript" src="../../closure/base.js"></script>
+	<script type="text/javascript" src="common.js"></script>
+  <script type="text/javascript">
+	goog.require('goog.testing.jsunit');
+	</script>
+</head>
+<body>
+  <h1 style="color: red">Assumes fileExists works</h1>
+	<script type="text/javascript">
+	function testRemovesFile() {
+    var toDelete = getPath("to-delete.txt");
+    assertTrue(plugin.fileExists(toDelete));
+    
+    plugin.removeFile(toDelete);
+    
+    assertFalse(plugin.fileExists(toDelete));
+  }
+  
+  function testRemovesEmptyDirectory() {
+    var toDelete = getPath("empty-dir-to-delete");
+    assertTrue(plugin.fileExists(toDelete));
+    
+    plugin.removeFile(toDelete);
+    
+    assertFalse(plugin.fileExists(toDelete));
+  }
+  
+  function testRemovesDirectoryContainingFiles() {
+    var toDelete = getPath("directory-with-files-to-delete");
+    assertTrue(plugin.fileExists(toDelete));
+    assertTrue(plugin.fileExists(toDelete + "\\1.txt"));
+    
+    plugin.removeFile(toDelete);
+    
+    assertFalse(plugin.fileExists(toDelete));
+    assertFalse(plugin.fileExists(toDelete + "\\1.txt"));
+  }
+  
+  function testRemovesDirectoryContainingDirectoryContainingFiles() {
+    var toDelete = getPath("directory-with-files-and-directories-to-delete");
+    assertTrue(plugin.fileExists(toDelete));
+    assertTrue(plugin.fileExists(toDelete + "\\1.txt"));
+    assertTrue(plugin.fileExists(toDelete + "\\subdir"));
+    assertTrue(plugin.fileExists(toDelete + "\\subdir\\2.txt"));
+    
+    plugin.removeFile(toDelete);
+    
+    assertFalse(plugin.fileExists(toDelete));
+    assertFalse(plugin.fileExists(toDelete + "\\1.txt"));
+    assertFalse(plugin.fileExists(toDelete + "\\subdir"));
+    assertFalse(plugin.fileExists(toDelete + "\\subdir\\2.txt"));
+  }
+  
+  function testRemovingFileNonExistentFileIsNoOp() {
+    plugin.removeFile(getPath("does-not-exist-to-delete2.txt"));
+  }
+  
+  function testRemovingFileContainingNullThrows() {
+    assertThrows(function() { plugin.removeFile("another-exists" + "\000" + ".txt"); });
+  }
+	</script>
+</body>
+</html>
