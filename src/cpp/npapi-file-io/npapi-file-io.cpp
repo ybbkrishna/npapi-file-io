@@ -117,10 +117,20 @@ bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name) {
 }
 
 bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVariant &arg, NPVariant *&result) {
+  if (!(NPVARIANT_IS_STRING(arg))) {
+    return false;
+  }
+
+  bool success = false;
+
+  char *argStringValue = new char[arg.value.stringValue.UTF8Length + 1];
+  strncpy(argStringValue, arg.value.stringValue.UTF8Characters, arg.value.stringValue.UTF8Length);
+  argStringValue[arg.value.stringValue.UTF8Length] = '\0';
+
   if (!strcmp(methodName, "fileExists")) {
     //fileExists(filename : string) : bool
-    SetReturnValue(fileExists(arg.value.stringValue.UTF8Characters), *result);
-    return true;
+    SetReturnValue(fileExists(argStringValue), *result);
+    success = true;
   } else if (!strcmp(methodName, "getTextFile")) {
     //getTextFile(filename : string) : string
     char *value = NULL;
@@ -128,7 +138,7 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     if (getFile(arg.value.stringValue.UTF8Characters, value, len, false)) {
       SetReturnValue(value, len, *result);
       delete[] value;
-      return true;
+      success = true;
     }
     delete[] value;
   } else if (!strcmp(methodName, "getBinaryFile")) {
@@ -137,11 +147,13 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     if (getFile(arg.value.stringValue.UTF8Characters, value, len, true)) {
       SetArrayReturnValue(value, len, GetInstance(npobj), result);
     }
-    return true;
+    success = true;
   } else if (!strcmp(methodName, "mkdir")) {
-    return myMkdir(arg.value.stringValue.UTF8Characters);
+    success = myMkdir(arg.value.stringValue.UTF8Characters);
   }
-  return false;
+
+  delete[] argStringValue;
+  return success;
 }
 
 bool InvokeJavascript(NPObject *npobj,
@@ -151,12 +163,15 @@ bool InvokeJavascript(NPObject *npobj,
                       NPVariant *result) {
   const char *methodName = browserFuncs->utf8fromidentifier(name);
   bool success = false;
-  if (argCount == 1 && NPVARIANT_IS_STRING(args[0])) {
+  switch (argCount) {
+  case 1:
     success = InvokeJavascript_OneArg(npobj, methodName, args[0], result);
-  } else if (argCount == 2 && NPVARIANT_IS_STRING(args[0]) && NPVARIANT_IS_STRING(args[1])) {
-    if (!strcmp(methodName, "saveText")) {
-      success = saveText(args[0].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Length);
-    }
+    break;
+  case 2:
+    //if (!strcmp(methodName, "saveText") && NPVARIANT_IS_STRING(args[0]) && NPVARIANT_IS_STRING(args[1])) {
+      //success = saveText(args[0].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Length);
+    //}
+    break;
   }
   browserFuncs->memfree((void *)methodName);
   return success;
