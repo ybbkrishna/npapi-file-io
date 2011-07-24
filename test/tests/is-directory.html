@@ -15,6 +15,14 @@
     assertTrue(plugin.isDirectory(getPath("subdir-exists")));
   }
   
+  function testDirectoryWithTrailingSlashIsDirectory() {
+    assertTrue(plugin.isDirectory(getPath("subdir-exists" + getPlatformSlash())));
+  }
+  
+  function testDirectoryWithTrailingSlashesIsDirectory() {
+    assertTrue(plugin.isDirectory(getPath("subdir-exists" + getPlatformSlash() + getPlatformSlash())));
+  }
+  
   function testFileIsNotDirectory() {
     assertFalse(plugin.isDirectory(getPath("a.txt")));
   }

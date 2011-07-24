@@ -12,30 +12,36 @@
 <body>
   <h1 style="color: red">Assumes fileExists works</h1>
 	<script type="text/javascript">
-  public void testCanMkdirWithTrailingSlash() {
-    var subdir = "subdir" + getRandom() + "\\";
-    plugin.createDirectory(getPath(subdir));
+  function testCanMkdirWithTrailingSlash() {
+    var subdir = getPath("subdir" + getRandom() + "\\");
+    plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
   
-  public void testCanMkdirWithoutTrailingSlash() {
-    var subdir = "subdir" + getRandom();
-    plugin.createDirectory(getPath(subdir));
+  function testCanMkdirWithoutTrailingSlash() {
+    var subdir = getPath("subdir" + getRandom());
+    plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
   
-  public void testCanMkdirRecursively() {
-    var subdir = "subdir" + getRandom() + "\\foo\\bar;
-    plugin.createDirectory(getPath(subdir));
+  function testCanMkdirRecursivelyWithoutTrailingSlash() {
+    var subdir = getPath("subdir" + getRandom() + "\\foo\\bar");
+    plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
   
-  public void testMkdirThrowsForExistingDirectory() {
-    assertThrows(function() { plugin.createDirectory("subdir-exists") });
+  function testCanMkdirRecursivelyWithTrailingSlash() {
+    var subdir = getPath("subdir" + getRandom() + "\\foo\\bar\\");
+    plugin.createDirectory(subdir);
+    assertTrue(plugin.fileExists(subdir));
   }
   
-  public void testMkdirThrowsForExistingFile() {
-    assertThrows(function() { plugin.createDirectory("exists.txt") });
+  function testMkdirThrowsForExistingDirectory() {
+    assertThrows(function() { plugin.createDirectory(getPath("subdir-exists")) });
+  }
+  
+  function testMkdirThrowsForExistingFile() {
+    assertThrows(function() { plugin.createDirectory(getPath("exists.txt")) });
   }
 	</script>
 </body>

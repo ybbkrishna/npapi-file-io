@@ -13,6 +13,13 @@ function getPath(filename) {
 	throw "Unsupported platform";
 }
 
+function getPlatformSlash() {
+  if (getPlatform() === "windows") {
+    return "\\";
+  }
+  throw "Unsupported platform";
+}
+
 function getRandom() {
   return Math.floor(Math.random() * 100000000000000);
 }

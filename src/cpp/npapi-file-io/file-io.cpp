@@ -10,15 +10,36 @@
 #include <sys/stat.h>
 
 #include <direct.h>
+#include <cstring>
+#include <string>
+
+const char *dropTrailingSlash(const char *filenameWithTrailingSlash) {
+  char *filenameWithoutTrailingSlash = new char[strlen(filenameWithTrailingSlash) + 1];
+  strcpy(filenameWithoutTrailingSlash, filenameWithTrailingSlash);
+  for (int i = strlen(filenameWithoutTrailingSlash) - 1; i >= 0; --i) {
+    if (filenameWithoutTrailingSlash[i] == '\\') {
+      filenameWithoutTrailingSlash[i] = '\0';
+    } else {
+      break;
+    }
+  }
+  return filenameWithoutTrailingSlash;
+}
 
 bool fileExists(const char *filename) {
+  const char *filenameWithoutTailingSlash = dropTrailingSlash(filename);
   struct stat s;
-  return stat(filename, &s) == 0;
+  bool fileExists = stat(filenameWithoutTailingSlash, &s) == 0;
+  delete[] filenameWithoutTailingSlash;
+  return fileExists;
 }
 
 bool isDirectory(const char *filename) {
+  const char *filenameWithoutTailingSlash = dropTrailingSlash(filename);
   struct stat s;
-  return stat(filename, &s) == 0 && (s.st_mode & S_IFDIR);
+  bool isDirectory = stat(filenameWithoutTailingSlash, &s) == 0 && (s.st_mode & S_IFDIR);
+  delete[] filenameWithoutTailingSlash;
+  return isDirectory;
 }
 
 bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {
@@ -66,6 +87,22 @@ bool saveText(const char *filename, const char *value, size_t len) {
   return true;
 }
 
-bool myMkdir(const char *filename) {
-  return _mkdir(filename) == 0;
+bool createDirectory(const char *filename) {
+  const char *filenameWithoutTrailingSlash = dropTrailingSlash(filename);
+  std::string filenameToSplit(filenameWithoutTrailingSlash);
+  bool lastSucceeded = false;
+  bool first = true;
+  size_t lastSlash = -1;
+  while (first || lastSlash != std::string::npos) {
+    first = false;
+    lastSlash = filenameToSplit.find("\\", lastSlash + 1);
+    std::string substr = lastSlash == std::string::npos ? filenameToSplit : filenameToSplit.substr(0, lastSlash + 1);
+    const char *subdir = substr.c_str();
+    if (!fileExists(subdir)) {
+      lastSucceeded = _mkdir(subdir) == 0;
+    }
+  }
+
+  delete[] filenameWithoutTrailingSlash;
+  return lastSucceeded;
 }

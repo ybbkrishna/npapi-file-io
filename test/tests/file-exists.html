@@ -26,6 +26,16 @@
     assertTrue(plugin.fileExists(exists));
   }
   
+  function testDetectsFolderWhichExistsWithTrailingSlash() {
+    var exists = getPath("subdir-exists" + getPlatformSlash());
+    assertTrue(plugin.fileExists(exists));
+  }
+  
+  function testDetectsFolderWhichExistsWithTrailingSlashes() {
+    var exists = getPath("subdir-exists" + getPlatformSlash() + getPlatformSlash());
+    assertTrue(plugin.fileExists(exists));
+  }
+  
   function testDetectsFolderWhichDoesNotExist() {
     var exists = getPath("subdir-does-not-exist");
     assertFalse(plugin.fileExists(exists));
