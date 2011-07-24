@@ -18,6 +18,10 @@
   function testFileIsNotDirectory() {
     assertFalse(plugin.isDirectory(getPath("a.txt")));
   }
+  
+  function testDirectoryWhichDoesNotExistIsNotDirectory() {
+    assertFalse(plugin.isDirectory(getPath("directory-does-not-exist-really")));
+  }
 	</script>
 </body>
 </html>
