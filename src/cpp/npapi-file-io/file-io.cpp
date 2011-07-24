@@ -11,11 +11,14 @@
 
 #include <direct.h>
 
-//Returns true if successful, false otherwise
-//Sets exists to true if fileExists, false otherwise
 bool fileExists(const char *filename) {
   struct stat s;
   return stat(filename, &s) == 0;
+}
+
+bool isDirectory(const char *filename) {
+  struct stat s;
+  return stat(filename, &s) == 0 && (s.st_mode & S_IFDIR);
 }
 
 bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {

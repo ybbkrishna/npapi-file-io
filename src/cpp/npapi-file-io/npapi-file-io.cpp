@@ -131,6 +131,9 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     //fileExists(filename : string) : bool
     SetReturnValue(fileExists(argStringValue), *result);
     success = true;
+  } else if (!strcmp(methodName, "isDirectory")) {
+    SetReturnValue(isDirectory(argStringValue), *result);
+    success = true;
   } else if (!strcmp(methodName, "getTextFile")) {
     //getTextFile(filename : string) : string
     char *value = NULL;
