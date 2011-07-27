@@ -100,6 +100,10 @@ bool createDirectory(const char *filename) {
   return lastSucceeded;
 }
 
+bool removeFile(const char *filename) {
+  return DeleteFile(filename) != 0;
+}
+
 bool getTempPath(char *&value, size_t &len) {
   const size_t bufferSize = 1024;
   value = new char[bufferSize];

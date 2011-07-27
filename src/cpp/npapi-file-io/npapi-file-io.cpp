@@ -174,6 +174,8 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
       success = SetArrayReturnValue(value, len, GetInstance(npobj), result);
       delete[] value;
     }
+  } else if (!strcmp(methodName, "removeFile")) {
+    success = SetReturnValue(removeFile(argStringValue), *result);
   }
 
   delete[] argStringValue;
