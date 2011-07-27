@@ -14,6 +14,8 @@
 #include <cstring>
 #include <string>
 
+bool removeDirectory(const char *filename);
+
 const char *dropTrailingSlash(const char *filenameWithTrailingSlash) {
   char *filenameWithoutTrailingSlash = new char[strlen(filenameWithTrailingSlash) + 1];
   strcpy(filenameWithoutTrailingSlash, filenameWithTrailingSlash);
@@ -102,9 +104,13 @@ bool createDirectory(const char *filename) {
 
 bool removeFile(const char *filename) {
   if (isDirectory(filename)) {
-    return RemoveDirectoryA(filename);
+    return removeDirectory(filename);
   }
   return DeleteFile(filename) != 0;
+}
+
+bool removeDirectory(const char *filename) {
+  return RemoveDirectoryA(filename);
 }
 
 bool getTempPath(char *&value, size_t &len) {
