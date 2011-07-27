@@ -154,6 +154,7 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     }
     delete[] value;*/
   } else if (!strcmp(methodName, "getBinaryFile")) {
+    //getBinaryFile(filename : string) : array<byte>
     char *value = NULL;
     size_t len;
     if (getFile(argStringValue, value, len, true)) {
