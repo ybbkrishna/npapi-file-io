@@ -141,9 +141,7 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
 
   bool success = false;
 
-  char *argStringValue = new char[arg.value.stringValue.UTF8Length + 1];
-  strncpy(argStringValue, arg.value.stringValue.UTF8Characters, arg.value.stringValue.UTF8Length);
-  argStringValue[arg.value.stringValue.UTF8Length] = '\0';
+  const char *argStringValue = stringFromNpVariant(arg);
 
   if (!strcmp(methodName, "fileExists")) {
     //fileExists(filename : string) : bool
@@ -182,6 +180,18 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
   return success;
 }
 
+bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPVariant &arg1, const NPVariant &arg2, NPVariant *&result) {
+  bool success = false;
+  if (!strcmp(methodName, "saveTextFile") && NPVARIANT_IS_STRING(arg1) && NPVARIANT_IS_STRING(arg2)) {
+    const char *filename = stringFromNpVariant(arg1);
+    const char *contents = stringFromNpVariant(arg2);
+    success = SetReturnValue(saveText(filename, contents, arg2.value.stringValue.UTF8Length), *result);
+    delete[] contents;
+    delete[] filename;
+  }
+  return success;
+}
+
 bool InvokeJavascript(NPObject *npobj,
                       NPIdentifier name,
                       const NPVariant *args,
@@ -197,9 +207,7 @@ bool InvokeJavascript(NPObject *npobj,
     success = InvokeJavascript_OneArg(npobj, methodName, args[0], result);
     break;
   case 2:
-    //if (!strcmp(methodName, "saveText") && NPVARIANT_IS_STRING(args[0]) && NPVARIANT_IS_STRING(args[1])) {
-      //success = saveText(args[0].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Characters, args[1].value.stringValue.UTF8Length);
-    //}
+    success = InvokeJavascript_TwoArgs(npobj, methodName, args[0], args[1], result);
     break;
   }
   browserFuncs->memfree((void *)methodName);
@@ -248,4 +256,11 @@ bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVa
   str << "]; })()";
   *result = *eval(instance, str.str().c_str());
   return true;
+}
+
+const char *stringFromNpVariant(const NPVariant &var) {
+  char *argStringValue = new char[var.value.stringValue.UTF8Length + 1];
+  memcpy(argStringValue, var.value.stringValue.UTF8Characters, var.value.stringValue.UTF8Length);
+  argStringValue[var.value.stringValue.UTF8Length] = '\0';
+  return argStringValue;
 }

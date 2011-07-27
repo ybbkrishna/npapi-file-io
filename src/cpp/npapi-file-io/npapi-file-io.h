@@ -23,11 +23,14 @@ bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name);
 bool InvokeJavascript(NPObject *npobj, NPIdentifier name, const NPVariant *args, uint32_t argCount, NPVariant *result);
 bool InvokeJavascript_NoArgs(NPObject *npobj, const char *methodName, NPVariant *&result);
 bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVariant &arg, NPVariant *&result);
+bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPVariant &arg1, const NPVariant &arg2, NPVariant *&result);
 bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVariant *result);
 bool SetReturnValue(const char *value, const size_t len, NPVariant &result);
 bool SetReturnValue(const bool value, NPVariant &result);
 void SetInstance(NPP instance, NPObject *passedObj);
 NPP GetInstance(NPObject *passedObj);
+
+const char *stringFromNpVariant(const NPVariant &var);
 
 struct NPClassWithNPP {
   uint32_t structVersion;

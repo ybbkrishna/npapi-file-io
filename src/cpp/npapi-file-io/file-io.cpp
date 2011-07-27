@@ -74,9 +74,22 @@ bool saveText(const char *filename, const char *value, size_t len) {
   if (fopen_s(&file, filename, "w") || !file) {
     return false;
   }
-  if (fputs(value, file) == EOF) {
-    fclose(file);
-    return false;
+
+  size_t written = 0;
+  while (written < len) {
+    const char *start = value + written;
+    if (fputs(start, file) == EOF) {
+      fclose(file);
+      return false;
+    }
+    written += strlen(start);
+    while (written < len && value[written] == '\0') {
+      if (fputc('\0', file) == EOF) {
+        fclose(file);
+        return false;
+      }
+      ++written;
+    }
   }
   fclose(file);
   return true;
