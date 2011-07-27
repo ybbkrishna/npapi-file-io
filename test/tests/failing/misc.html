@@ -12,7 +12,7 @@
 <body>
 	<script type="text/javascript">
 	function testDetectsPlatformAsWindows() {
-    fail("Does not do platform detection yet");
+    assertEquals("windows", plugin.getPlatform());
   }
 	
 	function testGetPathReturnsFileInPath() {
@@ -21,7 +21,11 @@
   }
   
   function testGetTmpPathGetsTmpPath() {
-    fail("Does not get tmp path yet");
+    assertEquals("C:\\Users\\daw63\\AppData\\Local\\Temp\\", plugin.getTempPath());
+  }
+  
+  function testTmpPathEqualsTempPath() {
+    assertEquals(plugin.getTmpPath(), plugin.getTempPath());
   }
 	</script>
 </body>

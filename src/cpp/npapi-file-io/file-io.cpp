@@ -6,6 +6,7 @@
 
 #if defined(OS_WIN)
 #include <io.h>
+#include <windows.h>
 #endif
 #include <sys/stat.h>
 
@@ -97,4 +98,11 @@ bool createDirectory(const char *filename) {
 
   delete[] filenameWithoutTrailingSlash;
   return lastSucceeded;
+}
+
+bool getTempPath(char *&value, size_t &len) {
+  const size_t bufferSize = 1024;
+  value = new char[bufferSize];
+  len = GetTempPathA(bufferSize, value);
+  return len != 0;
 }

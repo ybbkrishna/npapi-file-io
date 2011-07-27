@@ -116,6 +116,24 @@ bool HasJavascriptMethod(NPObject *npobj, NPIdentifier name) {
   return true;
 }
 
+bool InvokeJavascript_NoArgs(NPObject *npobj, const char *methodName, NPVariant *&result) {
+  bool success = false;
+  if (!strcmp(methodName, "getPlatform")) {
+    //getPlatform() : string
+#if defined(OS_WIN)
+    success = SetReturnValue("windows", 7, *result);
+#endif 
+  } else if (!strcmp(methodName, "getTempPath") || !strcmp(methodName, "getTmpPath")) {
+    char *value = NULL;
+    size_t len = 0;
+    if (getTempPath(value, len)) {
+      success = SetReturnValue(value, len, *result);
+      delete[] value;
+    }
+  }
+  return success;
+}
+
 bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVariant &arg, NPVariant *&result) {
   if (!(NPVARIANT_IS_STRING(arg))) {
     return false;
@@ -129,12 +147,10 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
 
   if (!strcmp(methodName, "fileExists")) {
     //fileExists(filename : string) : bool
-    SetReturnValue(fileExists(argStringValue), *result);
-    success = true;
+    success = SetReturnValue(fileExists(argStringValue), *result);
   } else if (!strcmp(methodName, "isDirectory")) {
     //isDirectory(filename : string) : bool
-    SetReturnValue(isDirectory(argStringValue), *result);
-    success = true;
+    success = SetReturnValue(isDirectory(argStringValue), *result);
   } else if (!strcmp(methodName, "createDirectory")) {
     if (!createDirectory(argStringValue)) {
       //TODO: Throw a particular exception
@@ -145,20 +161,18 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
   } else if (!strcmp(methodName, "getTextFile")) {
     //getTextFile(filename : string) : string
     char *value = NULL;
-    size_t len;
+    size_t len = 0;
     if (getFile(argStringValue, value, len, false)) {
-      SetReturnValue(value, len, *result);
+      success = SetReturnValue(value, len, *result);
       delete[] value;
-      success = true;
     }
   } else if (!strcmp(methodName, "getBinaryFile")) {
     //getBinaryFile(filename : string) : array<byte>
     char *value = NULL;
-    size_t len;
+    size_t len = 0;
     if (getFile(argStringValue, value, len, true)) {
-      SetArrayReturnValue(value, len, GetInstance(npobj), result);
+      success = SetArrayReturnValue(value, len, GetInstance(npobj), result);
       delete[] value;
-      success = true;
     }
   }
 
@@ -174,6 +188,9 @@ bool InvokeJavascript(NPObject *npobj,
   const char *methodName = browserFuncs->utf8fromidentifier(name);
   bool success = false;
   switch (argCount) {
+  case 0:
+    success = InvokeJavascript_NoArgs(npobj, methodName, result);
+    break;
   case 1:
     success = InvokeJavascript_OneArg(npobj, methodName, args[0], result);
     break;
