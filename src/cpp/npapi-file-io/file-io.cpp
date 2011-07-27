@@ -101,6 +101,9 @@ bool createDirectory(const char *filename) {
 }
 
 bool removeFile(const char *filename) {
+  if (isDirectory(filename)) {
+    return RemoveDirectoryA(filename);
+  }
   return DeleteFile(filename) != 0;
 }
 

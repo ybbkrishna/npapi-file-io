@@ -10,7 +10,7 @@
 	</script>
 </head>
 <body>
-  <h1 style="color: red">Assumes fileExists works</h1>
+  <h1 style="color: red">Assumes createDirectory, fileExists work</h1>
 	<script type="text/javascript">
 	function testRemovesFile() {
     var toDelete = getPath("to-delete.txt");
@@ -22,7 +22,8 @@
   }
   
   function testRemovesEmptyDirectory() {
-    var toDelete = getPath("empty-dir-to-delete");
+    var toDelete = getPath("subdir-to-delete" + getRandom());
+    plugin.createDirectory(toDelete);
     assertTrue(plugin.fileExists(toDelete));
     
     plugin.removeFile(toDelete);
