@@ -142,25 +142,24 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     } else {
       success = true;
     }
-
-/*  } else if (!strcmp(methodName, "getTextFile")) {
+  } else if (!strcmp(methodName, "getTextFile")) {
     //getTextFile(filename : string) : string
     char *value = NULL;
     size_t len;
-    if (getFile(arg.value.stringValue.UTF8Characters, value, len, false)) {
+    if (getFile(argStringValue, value, len, false)) {
       SetReturnValue(value, len, *result);
       delete[] value;
       success = true;
     }
-    delete[] value;*/
   } else if (!strcmp(methodName, "getBinaryFile")) {
     //getBinaryFile(filename : string) : array<byte>
     char *value = NULL;
     size_t len;
     if (getFile(argStringValue, value, len, true)) {
       SetArrayReturnValue(value, len, GetInstance(npobj), result);
+      delete[] value;
+      success = true;
     }
-    success = true;
   }
 
   delete[] argStringValue;

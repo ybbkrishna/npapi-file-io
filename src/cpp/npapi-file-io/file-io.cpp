@@ -60,14 +60,6 @@ bool getFile(const char *filename, char *&value, size_t &len, const bool isBinar
 
   len = fread(value, 1, fileLength, file);
   fclose(file);
-
-  if (!isBinary) {
-    for (size_t i = 0; i < len; ++i) {
-      if (value[i] == 0) {
-        return false;
-      }
-    }
-  }
   return true;
 }
 
