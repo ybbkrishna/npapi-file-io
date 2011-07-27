@@ -132,16 +132,18 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     SetReturnValue(fileExists(argStringValue), *result);
     success = true;
   } else if (!strcmp(methodName, "isDirectory")) {
+    //isDirectory(filename : string) : bool
     SetReturnValue(isDirectory(argStringValue), *result);
     success = true;
   } else if (!strcmp(methodName, "createDirectory")) {
     if (!createDirectory(argStringValue)) {
+      //TODO: Throw a particular exception
       success = false;
-      //ThrowBecauseFolderAlreadyExists(argStringValue, GetInstance(npobj), result);
     } else {
       success = true;
     }
-  } else if (!strcmp(methodName, "getTextFile")) {
+
+/*  } else if (!strcmp(methodName, "getTextFile")) {
     //getTextFile(filename : string) : string
     char *value = NULL;
     size_t len;
@@ -157,7 +159,7 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
     if (getFile(arg.value.stringValue.UTF8Characters, value, len, true)) {
       SetArrayReturnValue(value, len, GetInstance(npobj), result);
     }
-    success = true;
+    success = true;*/
   }
 
   delete[] argStringValue;
