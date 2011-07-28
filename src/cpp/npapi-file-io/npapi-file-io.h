@@ -13,6 +13,9 @@ extern "C" {
 NPError NP_Shutdown(void);
 }
 
+const size_t MAX_FILE_SIZE = 2147483647;
+const size_t MAX_FILE_SIZE_WIDTH_IN_DECIMAL_WITH_SPACE_FOR_NULL_TERMINATOR = 11;
+
 NPError SetPluginFuncs(NPPluginFuncs *plugin_funcs);
 NPError SetBrowserFuncs(NPNetscapeFuncs *browser_funcs);
 NPObject *Allocate(NPP instance, NPClass *clazz);
@@ -31,7 +34,7 @@ void SetInstance(NPP instance, NPObject *passedObj);
 NPP GetInstance(NPObject *passedObj);
 
 const char *stringFromNpVariant(const NPVariant &var);
-const char *byteArrayFromNpVariant(const NPVariant &var);
+const char *byteArrayFromNpVariant(const NPVariant &var, const NPP &npp, size_t &length);
 
 struct NPClassWithNPP {
   uint32_t structVersion;

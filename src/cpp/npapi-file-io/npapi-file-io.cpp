@@ -190,8 +190,9 @@ bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPV
     delete[] filename;
   } else if (!strcmp(methodName, "saveBinaryFile") && NPVARIANT_IS_STRING(arg1) && NPVARIANT_IS_OBJECT(arg2)) {
     const char *filename = stringFromNpVariant(arg1);
-    const char *bytes = byteArrayFromNpVariant(arg2);
-    success = SetReturnValue(saveBinaryFile(filename, bytes, 3), *result);
+    size_t length;
+    const char *bytes = byteArrayFromNpVariant(arg2, GetInstance(npobj), length);
+    success = SetReturnValue(saveBinaryFile(filename, bytes, length), *result);
     delete[] bytes;
     delete[] filename;
   }
@@ -271,10 +272,31 @@ const char *stringFromNpVariant(const NPVariant &var) {
   return argStringValue;
 }
 
-const char *byteArrayFromNpVariant(const NPVariant &var) {
-  char *bytes = new char[3];
-  bytes[0] = 97;
-  bytes[1] = 98;
-  bytes[2] = 99;
+const char *byteArrayFromNpVariant(const NPVariant &var, const NPP &npp, size_t &length) {
+  bool success = false;
+
+  NPVariant lengthVariant;
+  success = browserFuncs->getproperty(npp, var.value.objectValue, browserFuncs->getstringidentifier("length"), &lengthVariant);
+  if (!success || lengthVariant.value.doubleValue > MAX_FILE_SIZE || lengthVariant.value.doubleValue < 0) {
+    return NULL;
+  }
+  length = (size_t)lengthVariant.value.doubleValue;
+  
+  char *bytes = new char[length];
+  if (bytes == NULL) {
+    return NULL;
+  }
+
+  NPVariant element;
+  char buffer[MAX_FILE_SIZE_WIDTH_IN_DECIMAL_WITH_SPACE_FOR_NULL_TERMINATOR];
+  for (size_t i = 0; i < length; ++i) {
+    sprintf(buffer, "%u", i);
+    success = browserFuncs->getproperty(npp, var.value.objectValue, browserFuncs->getstringidentifier(buffer), &element);
+    if (!success) {
+      return false;
+    }
+    bytes[i] = (char)element.value.doubleValue;
+  }
+
   return bytes;
 }
