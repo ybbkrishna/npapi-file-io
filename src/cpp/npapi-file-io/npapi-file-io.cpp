@@ -188,6 +188,12 @@ bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPV
     success = SetReturnValue(saveText(filename, contents, arg2.value.stringValue.UTF8Length), *result);
     delete[] contents;
     delete[] filename;
+  } else if (!strcmp(methodName, "saveBinaryFile") && NPVARIANT_IS_STRING(arg1) && NPVARIANT_IS_OBJECT(arg2)) {
+    const char *filename = stringFromNpVariant(arg1);
+    const char *bytes = byteArrayFromNpVariant(arg2);
+    success = SetReturnValue(saveBinaryFile(filename, bytes, 3), *result);
+    delete[] bytes;
+    delete[] filename;
   }
   return success;
 }
@@ -263,4 +269,12 @@ const char *stringFromNpVariant(const NPVariant &var) {
   memcpy(argStringValue, var.value.stringValue.UTF8Characters, var.value.stringValue.UTF8Length);
   argStringValue[var.value.stringValue.UTF8Length] = '\0';
   return argStringValue;
+}
+
+const char *byteArrayFromNpVariant(const NPVariant &var) {
+  char *bytes = new char[3];
+  bytes[0] = 97;
+  bytes[1] = 98;
+  bytes[2] = 99;
+  return bytes;
 }

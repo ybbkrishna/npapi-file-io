@@ -95,6 +95,21 @@ bool saveText(const char *filename, const char *value, size_t len) {
   return true;
 }
 
+bool saveBinaryFile(const char *filename, const char *bytes, const size_t len) {
+  if (fileExists(filename)) {
+    return false;
+  }
+  FILE *file;
+  if (fopen_s(&file, filename, "wb") || !file) {
+    return false;
+  }
+
+  const size_t written = fwrite(bytes, 1, len, file);
+  fclose(file);
+
+  return (written == len);
+}
+
 bool createDirectory(const char *filename) {
   const char *filenameWithoutTrailingSlash = dropTrailingSlash(filename);
   std::string filenameToSplit(filenameWithoutTrailingSlash);

@@ -31,6 +31,7 @@ void SetInstance(NPP instance, NPObject *passedObj);
 NPP GetInstance(NPObject *passedObj);
 
 const char *stringFromNpVariant(const NPVariant &var);
+const char *byteArrayFromNpVariant(const NPVariant &var);
 
 struct NPClassWithNPP {
   uint32_t structVersion;
