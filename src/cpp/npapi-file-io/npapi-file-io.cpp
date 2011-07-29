@@ -173,7 +173,17 @@ bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVa
       delete[] value;
     }
   } else if (!strcmp(methodName, "removeFile")) {
+    //removeFile(filename : string) : void
     success = removeFile(argStringValue);
+  } else if (!strcmp(methodName, "listFiles")) {
+    //listFiles(filename : string) : array<object>
+    std::vector<FileEntry *> *entries;
+    if (listFiles(argStringValue, entries)) {
+      success = SetArrayReturnValue(*entries, GetInstance(npobj), result);
+      deleteFileEntries(entries);
+    } else {
+      success = false;
+    }
   }
 
   delete[] argStringValue;
@@ -265,6 +275,30 @@ bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVa
   return true;
 }
 
+void dumpFileEntryAsJson(std::ostringstream &str, const FileEntry *file) {
+  str << "{\"name\": \"" << file->name << "\", \"type\": \"" << (file->isDirectory ? "directory" : "file") << "\"}";
+}
+
+bool SetArrayReturnValue(const std::vector<FileEntry *> &files, NPP instance, NPVariant *result) {
+  std::ostringstream str;
+  str << "(function() { return [";
+  if (files.size() > 0) {
+    dumpFileEntryAsJson(str, files[0]);
+  }
+  for (size_t i = 1; i < files.size(); ++i) {
+    str << ",";
+    dumpFileEntryAsJson(str, files[i]);
+  }
+  str << "]; })()";
+
+  FILE *f = fopen("C:\\tmp\\play\\log.txt", "a");
+  fputs(str.str().c_str(), f);
+  fclose(f);
+
+  *result = *eval(instance, str.str().c_str());
+  return true;
+}
+
 const char *stringFromNpVariant(const NPVariant &var) {
   char *argStringValue = new char[var.value.stringValue.UTF8Length + 1];
   memcpy(argStringValue, var.value.stringValue.UTF8Characters, var.value.stringValue.UTF8Length);
@@ -299,4 +333,8 @@ const char *byteArrayFromNpVariant(const NPVariant &var, const NPP &npp, size_t 
   }
 
   return bytes;
+}
+
+void deleteFileEntries(std::vector<FileEntry *> *entries) {
+  entries->clear();
 }

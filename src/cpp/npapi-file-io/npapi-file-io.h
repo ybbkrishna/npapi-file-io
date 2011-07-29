@@ -4,6 +4,12 @@
 #include "npapi/bindings/npapi.h"
 #include "npapi/bindings/nphostapi.h"
 
+#include "file-io.h"
+
+#include <vector>
+
+class FileEntry;
+
 #if defined(OS_WIN)
 NPError __stdcall NP_GetEntryPoints(NPPluginFuncs *plugin_funcs);
 NPError __stdcall NP_Initialize(NPNetscapeFuncs *browser_funcs);
@@ -28,6 +34,7 @@ bool InvokeJavascript_NoArgs(NPObject *npobj, const char *methodName, NPVariant 
 bool InvokeJavascript_OneArg(NPObject *npobj, const char *methodName, const NPVariant &arg, NPVariant *&result);
 bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPVariant &arg1, const NPVariant &arg2, NPVariant *&result);
 bool SetArrayReturnValue(const char *value, const size_t len, NPP instance, NPVariant *result);
+bool SetArrayReturnValue(const std::vector<FileEntry *> &files, NPP instance, NPVariant *result);
 bool SetReturnValue(const char *value, const size_t len, NPVariant &result);
 bool SetReturnValue(const bool value, NPVariant &result);
 void SetInstance(NPP instance, NPObject *passedObj);
@@ -35,6 +42,8 @@ NPP GetInstance(NPObject *passedObj);
 
 const char *stringFromNpVariant(const NPVariant &var);
 const char *byteArrayFromNpVariant(const NPVariant &var, const NPP &npp, size_t &length);
+
+void deleteFileEntries(std::vector<FileEntry *> *entries);
 
 struct NPClassWithNPP {
   uint32_t structVersion;

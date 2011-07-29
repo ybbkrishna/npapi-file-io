@@ -147,3 +147,40 @@ bool getTempPath(char *&value, size_t &len) {
   len = GetTempPathA(bufferSize, value);
   return len != 0;
 }
+
+void pushFile(std::vector<FileEntry *> *&files, WIN32_FIND_DATAA &file) {
+  if (strcmp(".", file.cFileName) && strcmp("..", file.cFileName)) {
+    files->push_back(new FileEntry(file.cFileName, (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY));
+  }
+}
+
+//Assumes normalisedDirectoryName ends with the directory name, e.g. c:\foo NOT c:\foo\ 
+bool listFiles(const char *normalisedDirectoryName, std::vector<FileEntry *> *&files) {
+  if (!isDirectory(normalisedDirectoryName)) {
+    return false;
+  }
+  files = new std::vector<FileEntry *>();
+  
+  char *filenameSlashStar = new char[strlen(normalisedDirectoryName) + 3];
+  sprintf(filenameSlashStar, "%s\\*", normalisedDirectoryName);
+
+  WIN32_FIND_DATAA file;
+  HANDLE handle = FindFirstFileA(filenameSlashStar, &file);
+  if (handle == INVALID_HANDLE_VALUE) {
+    return false;
+  } else {
+    pushFile(files, file);
+  }
+  bool filesRemaining = true;
+  while (filesRemaining) {
+    if (FindNextFileA(handle, &file)) {
+      pushFile(files, file);
+    } else {
+      FindClose(handle);
+      filesRemaining = false;
+    }
+  }
+
+  delete[] filenameSlashStar;
+  return true;
+}
