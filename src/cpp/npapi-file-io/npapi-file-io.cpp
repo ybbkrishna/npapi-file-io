@@ -290,11 +290,6 @@ bool SetArrayReturnValue(const std::vector<FileEntry *> &files, NPP instance, NP
     dumpFileEntryAsJson(str, files[i]);
   }
   str << "]; })()";
-
-  FILE *f = fopen("C:\\tmp\\play\\log.txt", "a");
-  fputs(str.str().c_str(), f);
-  fclose(f);
-
   *result = *eval(instance, str.str().c_str());
   return true;
 }
