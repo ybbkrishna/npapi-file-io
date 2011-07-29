@@ -134,11 +134,28 @@ bool removeFile(const char *filename) {
   if (isDirectory(filename)) {
     return removeDirectory(filename);
   }
-  return DeleteFile(filename) != 0;
+
+  DWORD newAttributes = GetFileAttributesA(filename) & (((DWORD)-1) & ~FILE_ATTRIBUTE_READONLY);
+  return SetFileAttributesA(filename, newAttributes) && (DeleteFile(filename) != 0);
 }
 
 bool removeDirectory(const char *filename) {
-  return RemoveDirectoryA(filename);
+  bool success = true;
+
+  std::vector<FileEntry *> *subfiles;
+  listFiles(filename, subfiles);
+  std::vector<FileEntry *>::iterator file;
+  for (file = subfiles->begin() ; file < subfiles->end(); ++file) {
+    char *fullName = new char[strlen(filename) + strlen((*file)->name) + 2];
+    sprintf(fullName, "%s\\%s", filename, (*file)->name);
+    if (!removeFile(fullName)) {
+      success = false;
+      break;
+    }
+  }
+  subfiles->clear();
+  delete subfiles;
+  return success && RemoveDirectoryA(filename);
 }
 
 bool getTempPath(char *&value, size_t &len) {

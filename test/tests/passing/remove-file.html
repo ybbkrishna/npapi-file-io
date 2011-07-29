@@ -31,7 +31,7 @@
     assertFalse(plugin.fileExists(toDelete));
   }
   
-  function testRemovesDirectoryContainingFiles() {
+  function testRemovesDirectoryContainingFile() {
     var toDelete = getPath("directory-with-files-to-delete");
     assertTrue(plugin.fileExists(toDelete));
     assertTrue(plugin.fileExists(toDelete + "\\1.txt"));
@@ -57,13 +57,15 @@
     assertFalse(plugin.fileExists(toDelete + "\\subdir\\2.txt"));
   }
   
-  function testRemovingFileNonExistentFileIsNoOp() {
-    plugin.removeFile(getPath("does-not-exist-to-delete2.txt"));
+  function testRemovingFileNonExistentFileThrows() {
+    assertThrows(function() { plugin.removeFile(getPath("does-not-exist-to-delete2.txt")) });
   }
   
   function testRemovingFileContainingNullThrows() {
     assertThrows(function() { plugin.removeFile("another-exists" + "\000" + ".txt"); });
   }
+  
+  //TODO: Test dodgy filenames: containing ", ending with \, ending with \*
 	</script>
 </body>
 </html>
