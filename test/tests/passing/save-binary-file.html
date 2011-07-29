@@ -45,7 +45,7 @@
   function testThrowsIfFileExists() {
     var toMake = getPath("a.txt");
     assertThrows(function() { plugin.saveBinaryFile(toMake, [133]) });
-    assertEquals([97], plugin.getBinaryFile(toMake));
+    assertArrayEquals([97], plugin.getBinaryFile(toMake));
   }
   
   //TODO: Test dodgy objects with length set to wrong values

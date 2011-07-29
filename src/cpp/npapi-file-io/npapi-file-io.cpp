@@ -185,14 +185,14 @@ bool InvokeJavascript_TwoArgs(NPObject *npobj, const char *methodName, const NPV
   if (!strcmp(methodName, "saveTextFile") && NPVARIANT_IS_STRING(arg1) && NPVARIANT_IS_STRING(arg2)) {
     const char *filename = stringFromNpVariant(arg1);
     const char *contents = stringFromNpVariant(arg2);
-    success = SetReturnValue(saveText(filename, contents, arg2.value.stringValue.UTF8Length), *result);
+    success = saveText(filename, contents, arg2.value.stringValue.UTF8Length);
     delete[] contents;
     delete[] filename;
   } else if (!strcmp(methodName, "saveBinaryFile") && NPVARIANT_IS_STRING(arg1) && NPVARIANT_IS_OBJECT(arg2)) {
     const char *filename = stringFromNpVariant(arg1);
     size_t length;
     const char *bytes = byteArrayFromNpVariant(arg2, GetInstance(npobj), length);
-    success = SetReturnValue(saveBinaryFile(filename, bytes, length), *result);
+    success = saveBinaryFile(filename, bytes, length);
     delete[] bytes;
     delete[] filename;
   }
