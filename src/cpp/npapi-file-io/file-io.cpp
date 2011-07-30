@@ -7,12 +7,16 @@
 #if defined(OS_WIN)
 #include <io.h>
 #include <windows.h>
+#include <direct.h>
 #endif
 #include <sys/stat.h>
 
-#include <direct.h>
 #include <cstring>
 #include <string>
+
+#if defined(OS_LINUX)
+const mode_t DEFAULT_FOLDER_PERMISSIONS = S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP;
+#endif
 
 bool removeDirectory(const char *filename);
 
@@ -46,8 +50,8 @@ bool isDirectory(const char *filename) {
 }
 
 bool getFile(const char *filename, char *&value, size_t &len, const bool isBinary) {
-  FILE *file;
-  if (fopen_s(&file, filename, (isBinary ? "rb" : "r")) || !file) {
+  FILE *file = fopen(filename, isBinary ? "rb" : "r");
+  if (!file) {
     return false;
   }
 
@@ -70,8 +74,8 @@ bool saveText(const char *filename, const char *value, size_t len) {
   if (fileExists(filename)) {
     return false;
   }
-  FILE *file;
-  if (fopen_s(&file, filename, "w") || !file) {
+  FILE *file = fopen(filename, "w");
+  if (!file) {
     return false;
   }
 
@@ -99,8 +103,8 @@ bool saveBinaryFile(const char *filename, const char *bytes, const size_t len) {
   if (fileExists(filename)) {
     return false;
   }
-  FILE *file;
-  if (fopen_s(&file, filename, "wb") || !file) {
+  FILE *file = fopen(filename, "wb");
+  if (!file) {
     return false;
   }
 
@@ -122,7 +126,11 @@ bool createDirectory(const char *filename) {
     std::string substr = lastSlash == std::string::npos ? filenameToSplit : filenameToSplit.substr(0, lastSlash + 1);
     const char *subdir = substr.c_str();
     if (!fileExists(subdir)) {
+#if defined(OS_WIN)
       lastSucceeded = _mkdir(subdir) == 0;
+#elif defined(OS_LINUX)
+      lastSucceeded = mkdir(subdir, DEFAULT_FOLDER_PERMISSIONS);
+#endif
     }
   }
 
@@ -134,9 +142,12 @@ bool removeFile(const char *filename) {
   if (isDirectory(filename)) {
     return removeDirectory(filename);
   }
-
+#if defined(OS_WIN)
   DWORD newAttributes = GetFileAttributesA(filename) & (((DWORD)-1) & ~FILE_ATTRIBUTE_READONLY);
   return SetFileAttributesA(filename, newAttributes) && (DeleteFile(filename) != 0);
+#else
+  return false;
+#endif
 }
 
 bool removeDirectory(const char *filename) {
@@ -155,29 +166,40 @@ bool removeDirectory(const char *filename) {
   }
   subfiles->clear();
   delete subfiles;
+#if defined(OS_WIN)
   return success && RemoveDirectoryA(filename);
+#else
+  return false;
+#endif
 }
 
 bool getTempPath(char *&value, size_t &len) {
-  const size_t bufferSize = MAX_PATH + 1;
+#if defined(OS_WIN)
+  const size_t bufferSize = FILENAME_MAX + 1;
   value = new char[bufferSize];
   len = GetTempPathA(bufferSize, value);
   return len != 0;
+#else
+  return false;
+#endif
 }
 
+#if defined(OS_WIN)
 void pushFile(std::vector<FileEntry *> *&files, WIN32_FIND_DATAA &file) {
   if (strcmp(".", file.cFileName) && strcmp("..", file.cFileName)) {
     files->push_back(new FileEntry(file.cFileName, (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY));
   }
 }
+#endif
 
-//Assumes normalisedDirectoryName ends with the directory name, e.g. c:\foo NOT c:\foo\ 
+//Assumes normalisedDirectoryName ends with the directory name, e.g. "c:\foo" NOT "c:\foo\"
 bool listFiles(const char *normalisedDirectoryName, std::vector<FileEntry *> *&files) {
   if (!isDirectory(normalisedDirectoryName)) {
     return false;
   }
+#if defined(OS_WIN)
   files = new std::vector<FileEntry *>();
-  
+
   char *filenameSlashStar = new char[strlen(normalisedDirectoryName) + 3];
   sprintf(filenameSlashStar, "%s\\*", normalisedDirectoryName);
 
@@ -200,4 +222,7 @@ bool listFiles(const char *normalisedDirectoryName, std::vector<FileEntry *> *&f
 
   delete[] filenameSlashStar;
   return true;
+#else
+  return false;
+#endif
 }

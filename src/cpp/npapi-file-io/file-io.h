@@ -1,6 +1,7 @@
 #ifndef FILE_IO_H_
 #define FILE_IO_H_
 
+#include <cstring>
 #include <vector>
 
 class FileEntry {
