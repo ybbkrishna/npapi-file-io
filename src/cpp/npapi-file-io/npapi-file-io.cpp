@@ -57,7 +57,7 @@ char *NP_GetMIMEDescription(void) {
   fprintf(f, "NP_GetMIMEDescription\n");
   fclose(f);
 
-  return (char *)"application/x-npapi-file-io";
+  return (char *)"application/x-npapi-file-io::Chrome extension file access;";
 }
 
 NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
@@ -179,6 +179,8 @@ bool InvokeJavascript_NoArgs(NPObject *npobj, const char *methodName, NPVariant 
     //getPlatform() : string
 #if defined(OS_WIN)
     success = SetReturnValue("windows", 7, *result);
+#elif defined(OS_LINUX)
+    success = SetReturnValue("linux", 5, *result);
 #endif 
   } else if (!strcmp(methodName, "getTempPath") || !strcmp(methodName, "getTmpPath")) {
     char *value = NULL;
