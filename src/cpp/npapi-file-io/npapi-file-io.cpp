@@ -3,6 +3,12 @@
 #include "file-io.h"
 #include <sstream>
 
+#if defined(OS_WIN)
+#define SIZE_T_FORMAT_STRING "lu"
+#else
+#define SIZE_T_FORMAT_STRING "zu"
+#endif
+
 NPPluginFuncs *pluginFuncs = NULL;
 NPNetscapeFuncs *browserFuncs = NULL;
 NPObject *javascriptListener = NULL;
@@ -366,7 +372,7 @@ const char *byteArrayFromNpVariant(const NPVariant &var, const NPP &npp, size_t 
   NPVariant element;
   char buffer[MAX_FILE_SIZE_WIDTH_IN_DECIMAL_WITH_SPACE_FOR_NULL_TERMINATOR];
   for (size_t i = 0; i < length; ++i) {
-    sprintf(buffer, "%u", i);
+    sprintf(buffer, "%" SIZE_T_FORMAT_STRING, i);
     success = browserFuncs->getproperty(npp, var.value.objectValue, browserFuncs->getstringidentifier(buffer), &element);
     if (!success) {
       return false;
