@@ -3,12 +3,14 @@ plugin.setAttribute("type", "application/x-npapi-file-io");
 document.documentElement.appendChild(plugin);
 
 function getPlatform() {
-	return "windows";
+	return plugin.getPlatform();
 }
 
 function getPath(filename) {
 	if (getPlatform() === "windows") {
 		return "C:\\svn\\npapi-file-io\\test\\files\\" + filename;
+	} else if (getPlatform() === "linux") {
+		return "/home/daw63/wcs/npapi-file-io/test/files/" + filename;
 	}
 	throw "Unsupported platform";
 }
@@ -16,6 +18,8 @@ function getPath(filename) {
 function getPlatformSlash() {
   if (getPlatform() === "windows") {
     return "\\";
+  } else {
+    return "/";
   }
   throw "Unsupported platform";
 }
