@@ -13,7 +13,7 @@
   <h1 style="color: red">Assumes fileExists works</h1>
 	<script type="text/javascript">
   function testCanMkdirWithTrailingSlash() {
-    var subdir = getPath("subdir" + getRandom() + "\\");
+    var subdir = getPath("subdir" + getRandom() + getPlatformSlash());
     plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
@@ -25,13 +25,13 @@
   }
   
   function testCanMkdirRecursivelyWithoutTrailingSlash() {
-    var subdir = getPath("subdir" + getRandom() + "\\foo\\bar");
+    var subdir = getPath("subdir" + getRandom() + getPlatformSlash() + "foo" + getPlatformSlash() + "bar");
     plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
   
   function testCanMkdirRecursivelyWithTrailingSlash() {
-    var subdir = getPath("subdir" + getRandom() + "\\foo\\bar\\");
+    var subdir = getPath("subdir" + getRandom() + getPlatformSlash()() + "foo" + getPlatformSlash() + "bar" + getPlatformSlash());
     plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }

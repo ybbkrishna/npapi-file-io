@@ -37,8 +37,8 @@
 	function testNonEmptyDirReturnsFiles() {
     var path = getPath("nonempty" + getRandom());
     plugin.createDirectory(path);
-    plugin.saveTextFile(path + "\\1.txt", "");
-    plugin.saveTextFile(path + "\\2.txt", "");
+    plugin.saveTextFile(path + getPlatformSlash() + "1.txt", "");
+    plugin.saveTextFile(path + getPlatformSlash() + "2.txt", "");
     console.log(JSON.stringify([{name: "1.txt", type: "file"}, {name: "2.txt", type: "file"}]));
     console.log(JSON.stringify(plugin.listFiles(getPath("nonempty-dir"))));
     assertSameElements([{name: "1.txt", type: "file"}, {name: "2.txt", type: "file"}], plugin.listFiles(path));
