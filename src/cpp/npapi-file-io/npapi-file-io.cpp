@@ -34,6 +34,7 @@ NPError __stdcall NP_Initialize(NPNetscapeFuncs *browser_funcs) {
   return NPERR_NO_ERROR;
 }
 #elif defined(OS_LINUX)
+extern "C" {
 NPError NP_Initialize(NPNetscapeFuncs *browser_funcs, NPPluginFuncs *plugin_funcs) {
   NPError error = SetPluginFuncs(plugin_funcs);
   if (error != NPERR_NO_ERROR) {
@@ -66,6 +67,7 @@ NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
     }
   }
   return NPERR_NO_ERROR;
+}
 }
 #endif
 
