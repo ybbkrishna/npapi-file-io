@@ -174,10 +174,14 @@ bool removeDirectory(const char *filename) {
 }
 
 bool getTempPath(char *&value, size_t &len) {
-#if defined(OS_WIN)
   const size_t bufferSize = FILENAME_MAX + 1;
   value = new char[bufferSize];
+#if defined(OS_WIN)
   len = GetTempPathA(bufferSize, value);
+  return len != 0;
+#elif defined(OS_LINUX)
+  sprintf(value, "%s/", P_tmpdir);
+  len = strlen(value);
   return len != 0;
 #else
   return false;
