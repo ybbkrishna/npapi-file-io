@@ -57,7 +57,7 @@ char *NP_GetMIMEDescription(void) {
   fprintf(f, "NP_GetMIMEDescription\n");
   fclose(f);
 
-  return (char *)"application/x-npapi-file-io::Chrome extension file access;";
+  return (char *)"application/x-npapi-file-io::Allows filesystem access to Chrome extensions;";
 }
 
 NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
