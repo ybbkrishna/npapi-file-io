@@ -36,10 +36,6 @@ NPError __stdcall NP_Initialize(NPNetscapeFuncs *browser_funcs) {
 #elif defined(OS_LINUX)
 extern "C" {
 NPError NP_Initialize(NPNetscapeFuncs *browser_funcs, NPPluginFuncs *plugin_funcs) {
-  FILE *f = fopen("/home/daw63/tmp/log.txt", "a");
-  fprintf(f, "NP_Initialize\n");
-  fclose(f);
-
   NPError error = SetPluginFuncs(plugin_funcs);
   if (error != NPERR_NO_ERROR) {
     ResetFuncs();
@@ -53,18 +49,10 @@ NPError NP_Initialize(NPNetscapeFuncs *browser_funcs, NPPluginFuncs *plugin_func
 }
 
 char *NP_GetMIMEDescription(void) {
-  FILE *f = fopen("/home/daw63/tmp/log.txt", "a");
-  fprintf(f, "NP_GetMIMEDescription\n");
-  fclose(f);
-
   return (char *)"application/x-npapi-file-io::Allows filesystem access to Chrome extensions;";
 }
 
 NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
-  FILE *f = fopen("/home/daw63/tmp/log.txt", "a");
-  fprintf(f, "NP_GetValue: %u\n", variable);
-  fclose(f);
-
   switch(variable) {
     case NPPVpluginNameString: {
       *((char **)value) = (char *)"Chrome extensions file IO";
