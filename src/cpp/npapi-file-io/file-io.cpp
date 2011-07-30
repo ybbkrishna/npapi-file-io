@@ -8,6 +8,8 @@
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
+#elif defined(OS_LINUX)
+#include <dirent.h>
 #endif
 #include <sys/stat.h>
 
@@ -199,6 +201,12 @@ void pushFile(std::vector<FileEntry *> *&files, WIN32_FIND_DATAA &file) {
     files->push_back(new FileEntry(file.cFileName, (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY));
   }
 }
+#elif defined(OS_LINUX)
+void pushFile(std::vector<FileEntry *> *&files, dirent *dirp) {
+  if (strcmp(".", dirp->d_name) && strcmp("..", dirp->d_name)) {
+    files->push_back(new FileEntry(dirp->d_name, dirp->d_type == DT_DIR));
+  }
+}
 #endif
 
 //Assumes normalisedDirectoryName ends with the directory name, e.g. "c:\foo" NOT "c:\foo\"
@@ -206,9 +214,8 @@ bool listFiles(const char *normalisedDirectoryName, std::vector<FileEntry *> *&f
   if (!isDirectory(normalisedDirectoryName)) {
     return false;
   }
-#if defined(OS_WIN)
   files = new std::vector<FileEntry *>();
-
+#if defined(OS_WIN)
   char *filenameSlashStar = new char[strlen(normalisedDirectoryName) + 3];
   sprintf(filenameSlashStar, "%s\\*", normalisedDirectoryName);
 
@@ -230,6 +237,18 @@ bool listFiles(const char *normalisedDirectoryName, std::vector<FileEntry *> *&f
   }
 
   delete[] filenameSlashStar;
+  return true;
+#elif defined(OS_LINUX)
+  DIR *dir;
+  struct dirent *dirp;
+  dir = opendir(normalisedDirectoryName);
+  if (dir == NULL) {
+    return false;
+  }
+  while ((dirp = readdir(dir)) != NULL) {
+    pushFile(files, dirp);
+  }
+  closedir(dir);
   return true;
 #else
   return false;
