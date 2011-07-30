@@ -15,9 +15,11 @@
     var a = getPath("a.txt");
     assertEquals("a", plugin.getTextFile(a));
   }
-	function testGetsCrLfAsBackslashN() {
+
+  function testGetsCrLfAsBackslashNOnWindowsButAsSlashRSlashNOnLinux() {
     var exists = getPath("exists.txt");
-    assertEquals("I contain\nsome text\n  on multiple lines", plugin.getTextFile(exists));
+    var text = plugin.getTextFile(exists);
+    assertEquals(getPlatform() == "windows" ? "I contain\nsome text\n  on multiple lines" : "I contain\r\nsome text\r\n  on multiple lines", text);
   }
   
   function testGetsTextContainingNull() {
