@@ -152,6 +152,8 @@ bool removeFile(const char *filename) {
 #if defined(OS_WIN)
   DWORD newAttributes = GetFileAttributesA(filename) & (((DWORD)-1) & ~FILE_ATTRIBUTE_READONLY);
   return SetFileAttributesA(filename, newAttributes) && (DeleteFile(filename) != 0);
+#elif defined(OS_LINUX)
+  return remove(filename) == 0;
 #else
   return false;
 #endif
@@ -175,6 +177,8 @@ bool removeDirectory(const char *filename) {
   delete subfiles;
 #if defined(OS_WIN)
   return success && RemoveDirectoryA(filename);
+#elif defined(OS_LINUX)
+  return success && (remove(filename) == 0);
 #else
   return false;
 #endif
