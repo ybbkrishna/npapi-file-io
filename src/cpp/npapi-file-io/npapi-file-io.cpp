@@ -35,7 +35,7 @@ NPError __stdcall NP_Initialize(NPNetscapeFuncs *browser_funcs) {
 }
 #elif defined(OS_LINUX)
 NPError NP_Initialize(NPNetscapeFuncs *browser_funcs, NPPluginFuncs *plugin_funcs) {
-  NPError error = SetPluginFuncs(pluigin_funcs);
+  NPError error = SetPluginFuncs(plugin_funcs);
   if (error != NPERR_NO_ERROR) {
     ResetFuncs();
     return error;
@@ -53,16 +53,17 @@ char *NP_GetMIMEDescription(void) {
 
 NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
   switch(variable) {
-  case NPPVpluginNameString: {
-    *((char **)value) = (char *)"Chrome extensions file IO";
-    break;
-  }
-  case NPPVpluginDescriptionString: {
-    *((char **)value) = (char *)"Plugin to allow Chrome extensions to access files on your computer";
-    break;
-  }
-  default: {
-    return NPERR_INVALID_PARAM;
+    case NPPVpluginNameString: {
+      *((char **)value) = (char *)"Chrome extensions file IO";
+      break;
+    }
+    case NPPVpluginDescriptionString: {
+      *((char **)value) = (char *)"Plugin to allow Chrome extensions to access files on your computer";
+      break;
+    }
+    default: {
+      return NPERR_INVALID_PARAM;
+    }
   }
   return NPERR_NO_ERROR;
 }
