@@ -157,6 +157,10 @@ NPError GetValue(NPP instance, NPPVariable variable, void *value) {
       SetInstance(instance, javascriptListener);
       break;
     }
+    case NPPVpluginNeedsXEmbed: {
+      *((bool *)value) = true;
+      break;
+    }
     default: {
       return NPERR_INVALID_PARAM;
     }
