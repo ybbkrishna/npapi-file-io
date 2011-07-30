@@ -24,6 +24,7 @@ const size_t MAX_FILE_SIZE_WIDTH_IN_DECIMAL_WITH_SPACE_FOR_NULL_TERMINATOR = 11;
 
 NPError SetPluginFuncs(NPPluginFuncs *plugin_funcs);
 NPError SetBrowserFuncs(NPNetscapeFuncs *browser_funcs);
+void ResetFuncs(void);
 NPObject *Allocate(NPP instance, NPClass *clazz);
 void Deallocate(NPObject *obj);
 NPError GetValue(NPP instance, NPPVariable variable, void *value);

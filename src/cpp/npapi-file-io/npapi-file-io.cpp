@@ -33,6 +33,39 @@ NPError __stdcall NP_Initialize(NPNetscapeFuncs *browser_funcs) {
   SetBrowserFuncs(browser_funcs);
   return NPERR_NO_ERROR;
 }
+#elif defined(OS_LINUX)
+NPError NP_Initialize(NPNetscapeFuncs *browser_funcs, NPPluginFuncs *plugin_funcs) {
+  NPError error = SetPluginFuncs(pluigin_funcs);
+  if (error != NPERR_NO_ERROR) {
+    ResetFuncs();
+    return error;
+  }
+  error = SetBrowserFuncs(browser_funcs);
+  if (error != NPERR_NO_ERROR) {
+    ResetFuncs();
+  }
+  return error;
+}
+
+char *NP_GetMIMEDescription(void) {
+  return (char *)"application/x-npapi-file-io";
+}
+
+NPError NP_GetValue(void *instance, NPPVariable variable, void *value) {
+  switch(variable) {
+  case NPPVpluginNameString: {
+    *((char **)value) = (char *)"Chrome extensions file IO";
+    break;
+  }
+  case NPPVpluginDescriptionString: {
+    *((char **)value) = (char *)"Plugin to allow Chrome extensions to access files on your computer";
+    break;
+  }
+  default: {
+    return NPERR_INVALID_PARAM;
+  }
+  return NPERR_NO_ERROR;
+}
 #endif
 
 extern "C" {
@@ -73,6 +106,11 @@ NPError SetBrowserFuncs(NPNetscapeFuncs *browser_funcs) {
   }
   browserFuncs = browser_funcs;
   return NPERR_NO_ERROR;
+}
+
+void ResetFuncs(void) {
+  browserFuncs = NULL;
+  pluginFuncs = NULL;
 }
 
 NPObject *Allocate(NPP instance, NPClass *clazz) {
