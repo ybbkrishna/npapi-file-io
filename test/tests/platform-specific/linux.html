@@ -10,23 +10,23 @@
 	</script>
 </head>
 <body>
-	<script type="text/javascript">
-	function testDetectsPlatformAsWindows() {
-    assertEquals("windows", plugin.getPlatform());
+  <script type="text/javascript">
+  function testDetectsPlatformAsLinux() {
+    assertEquals("linux", plugin.getPlatform());
   }
 	
-	function testGetPathReturnsFileInPath() {
+  function testGetPathReturnsFileInPath() {
     var filename = "file";
-    assertEquals("C:\\svn\\npapi-file-io\\test\\files\\" + filename, getPath(filename));
+    assertEquals("/home/daw63/wcs/npapi-file-io/test/files/" + filename, getPath(filename));
   }
   
   function testGetTmpPathGetsTmpPath() {
-    assertEquals("C:\\Users\\daw63\\AppData\\Local\\Temp\\", plugin.getTempPath());
+    assertEquals("/tmp/", plugin.getTempPath());
   }
   
   function testTmpPathEqualsTempPath() {
     assertEquals(plugin.getTmpPath(), plugin.getTempPath());
   }
-	</script>
+  </script>
 </body>
 </html>
