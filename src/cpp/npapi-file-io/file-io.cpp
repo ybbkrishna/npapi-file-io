@@ -16,6 +16,11 @@
 
 #if defined(OS_LINUX)
 const mode_t DEFAULT_FOLDER_PERMISSIONS = S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP;
+#define PLATFORM_PATH_SEPARATOR_CHAR '/'
+#define PLATFORM_PATH_SEPARATOR_STRING "/"
+#elif defined(OS_WIN)
+#define PLATFORM_PATH_SEPARATOR_CHAR '\\'
+#define PLATFORM_PATH_SEPARATOR_STRING "\\"
 #endif
 
 bool removeDirectory(const char *filename);
@@ -24,7 +29,7 @@ const char *dropTrailingSlash(const char *filenameWithTrailingSlash) {
   char *filenameWithoutTrailingSlash = new char[strlen(filenameWithTrailingSlash) + 1];
   strcpy(filenameWithoutTrailingSlash, filenameWithTrailingSlash);
   for (int i = strlen(filenameWithoutTrailingSlash) - 1; i >= 0; --i) {
-    if (filenameWithoutTrailingSlash[i] == '\\') {
+    if (filenameWithoutTrailingSlash[i] == PLATFORM_PATH_SEPARATOR_CHAR) {
       filenameWithoutTrailingSlash[i] = '\0';
     } else {
       break;
@@ -122,14 +127,14 @@ bool createDirectory(const char *filename) {
   size_t lastSlash = -1;
   while (first || lastSlash != std::string::npos) {
     first = false;
-    lastSlash = filenameToSplit.find("\\", lastSlash + 1);
+    lastSlash = filenameToSplit.find(PLATFORM_PATH_SEPARATOR_STRING, lastSlash + 1);
     std::string substr = lastSlash == std::string::npos ? filenameToSplit : filenameToSplit.substr(0, lastSlash + 1);
     const char *subdir = substr.c_str();
     if (!fileExists(subdir)) {
 #if defined(OS_WIN)
       lastSucceeded = _mkdir(subdir) == 0;
 #elif defined(OS_LINUX)
-      lastSucceeded = mkdir(subdir, DEFAULT_FOLDER_PERMISSIONS);
+      lastSucceeded = mkdir(subdir, DEFAULT_FOLDER_PERMISSIONS) == 0;
 #endif
     }
   }
@@ -158,7 +163,7 @@ bool removeDirectory(const char *filename) {
   std::vector<FileEntry *>::iterator file;
   for (file = subfiles->begin() ; file < subfiles->end(); ++file) {
     char *fullName = new char[strlen(filename) + strlen((*file)->name) + 2];
-    sprintf(fullName, "%s\\%s", filename, (*file)->name);
+    sprintf(fullName, "%s%s%s", filename, PLATFORM_PATH_SEPARATOR_STRING, (*file)->name);
     if (!removeFile(fullName)) {
       success = false;
       break;
