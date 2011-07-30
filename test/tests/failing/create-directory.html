@@ -31,7 +31,7 @@
   }
   
   function testCanMkdirRecursivelyWithTrailingSlash() {
-    var subdir = getPath("subdir" + getRandom() + getPlatformSlash()() + "foo" + getPlatformSlash() + "bar" + getPlatformSlash());
+    var subdir = getPath("subdir" + getRandom() + getPlatformSlash() + "foo" + getPlatformSlash() + "bar" + getPlatformSlash());
     plugin.createDirectory(subdir);
     assertTrue(plugin.fileExists(subdir));
   }
