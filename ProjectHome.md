@@ -1,0 +1,1 @@
+Project to supply access to the filesystem to Chrome extensions through NPAPI.
